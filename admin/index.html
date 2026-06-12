@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Maison Lumière</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body class="admin-body">
+
+  <!-- ADMIN SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-main">Maison Lumière</span>
+      <span class="logo-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sn-item active" data-tab="products">
+        <span class="sn-icon">🌸</span> Products
+      </a>
+      <a href="#" class="sn-item" data-tab="settings">
+        <span class="sn-icon">⚙️</span> Settings
+      </a>
+      <a href="../index.html" class="sn-item sn-external">
+        <span class="sn-icon">🏪</span> View Shop
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="sidebar-version">Maison Lumière v1.0</span>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main">
+
+    <!-- PRODUCTS TAB -->
+    <div class="tab-pane active" id="tab-products">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title">Products</h1>
+          <p class="admin-subtitle">Manage your fragrance collection</p>
+        </div>
+        <button class="btn-add" id="btnAddProduct">+ Add New Fragrance</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- Product Table -->
+      <div class="table-wrap">
+        <table class="admin-table" id="adminTable">
+          <thead>
+            <tr>
+              <th>Fragrance</th>
+              <th>Notes</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-pane" id="tab-settings">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title">Settings</h1>
+          <p class="admin-subtitle">WhatsApp number, shop name, currency</p>
+        </div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-section">
+          <h3 class="settings-heading">WhatsApp Configuration</h3>
+          <div class="form-group">
+            <label>WhatsApp Number</label>
+            <input type="text" id="settingWhatsapp" placeholder="e.g. 9665XXXXXXXX (with country code, no +)"/>
+            <small>Include country code without +. Example: 9665XXXXXXXX for Saudi Arabia</small>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3 class="settings-heading">Shop Identity</h3>
+          <div class="form-group">
+            <label>Shop Name</label>
+            <input type="text" id="settingShopName" placeholder="My Fragrance Shop"/>
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="settingCurrency">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="SAR">SAR (SR)</option>
+              <option value="AED">AED</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-save" id="btnSaveSettings">Save Settings</button>
+        <p class="save-msg" id="saveMsg" style="display:none">✓ Settings saved!</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal admin-modal">
+      <button class="modal-close" id="productModalClose">✕</button>
+      <h3 class="modal-title" id="productModalTitle">Add New Fragrance</h3>
+
+      <div class="modal-grid">
+        <div class="form-group">
+          <label>Fragrance Name *</label>
+          <input type="text" id="pName" placeholder="e.g. Oud Noir Absolu"/>
+        </div>
+        <div class="form-group">
+          <label>Price *</label>
+          <input type="number" id="pPrice" placeholder="e.g. 150" min="0"/>
+        </div>
+        <div class="form-group full">
+          <label>Scent Notes</label>
+          <input type="text" id="pNotes" placeholder="e.g. Oud · Rose · Musk"/>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea id="pDesc" placeholder="Describe the fragrance experience..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Emoji Icon</label>
+          <input type="text" id="pEmoji" placeholder="🌸" maxlength="4"/>
+        </div>
+        <div class="form-group">
+          <label>Badge (optional)</label>
+          <input type="text" id="pBadge" placeholder="New / Limited / Bestseller"/>
+        </div>
+        <div class="form-group full">
+          <label>Card Background Gradient</label>
+          <select id="pBg">
+            <option value="linear-gradient(135deg,#1A1209 0%,#2E1A0E 100%)">Dark Oud</option>
+            <option value="linear-gradient(135deg,#5E1224 0%,#8B3A52 100%)">Deep Rose</option>
+            <option value="linear-gradient(135deg,#7B4A0F 0%,#C9A96E 100%)">Warm Amber</option>
+            <option value="linear-gradient(135deg,#0F3A5E 0%,#2A6B9C 100%)">Ocean Blue</option>
+            <option value="linear-gradient(135deg,#3B1F4E 0%,#7B5EA7 100%)">Iris Purple</option>
+            <option value="linear-gradient(135deg,#1E3C1A 0%,#4A7A40 100%)">Forest Green</option>
+            <option value="linear-gradient(135deg,#3A2B1A 0%,#6B5040 100%)">Rich Brown</option>
+            <option value="linear-gradient(135deg,#C9A96E 0%,#E8D5A3 100%)">Gold</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Available in Shop</label>
+          <select id="pAvailable">
+            <option value="true">Yes — Show to customers</option>
+            <option value="false">No — Hide from shop</option>
+          </select>
+        </div>
+      </div>
+
+      <input type="hidden" id="pEditId" value=""/>
+      <button class="btn-save" id="btnSaveProduct">Save Fragrance</button>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width:380px; text-align:center;">
+      <button class="modal-close" id="deleteModalClose">✕</button>
+      <div style="font-size:48px; margin-bottom:16px;">🗑️</div>
+      <h3 class="modal-title" style="margin-bottom:8px;">Remove Fragrance?</h3>
+      <p style="color:var(--smoke); margin-bottom:28px;" id="deleteProductName">This cannot be undone.</p>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button class="btn-cancel" id="deleteCancel">Cancel</button>
+        <button class="btn-delete" id="deleteConfirm">Yes, Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/products.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
