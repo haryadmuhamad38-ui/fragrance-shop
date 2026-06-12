@@ -4,6 +4,33 @@
 
 (function () {
 
+  // ---- PASSWORD PROTECTION ----
+  const ADMIN_PASSWORD = '@m el_la00900';
+  const SESSION_KEY = 'adminUnlocked';
+
+  function checkPassword() {
+    if (sessionStorage.getItem(SESSION_KEY) === 'yes') return;
+    document.getElementById('passwordOverlay').style.display = 'flex';
+  }
+
+  document.getElementById('passwordSubmit').addEventListener('click', () => {
+    const val = document.getElementById('passwordInput').value;
+    if (val === ADMIN_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, 'yes');
+      document.getElementById('passwordOverlay').style.display = 'none';
+    } else {
+      document.getElementById('passwordError').style.display = 'block';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    }
+  });
+
+  document.getElementById('passwordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('passwordSubmit').click();
+  });
+
+  checkPassword();
+
   // ---- TAB NAVIGATION ----
   document.querySelectorAll('.sn-item[data-tab]').forEach(item => {
     item.addEventListener('click', e => {

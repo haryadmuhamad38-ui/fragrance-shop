@@ -181,5 +181,17 @@
 
   <script src="../js/products.js"></script>
   <script src="admin.js"></script>
+
+  <!-- PASSWORD OVERLAY -->
+  <div id="passwordOverlay" style="display:none; position:fixed; inset:0; background:rgba(26,18,9,0.97); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="background:#FAF6F0; border-radius:12px; padding:48px 40px; max-width:380px; width:90%; text-align:center; box-shadow:0 24px 80px rgba(0,0,0,0.5);">
+      <div style="font-size:40px; margin-bottom:16px;">🔒</div>
+      <h2 style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400; color:#1A1209; margin-bottom:8px;">Admin Access</h2>
+      <p style="color:#6B6055; font-size:14px; margin-bottom:24px;">Enter your password to continue</p>
+      <input id="passwordInput" type="password" placeholder="Password" style="width:100%; padding:12px 16px; border:1px solid #E8D5A3; border-radius:4px; font-size:15px; background:#fff; color:#1A1209; outline:none; margin-bottom:12px;"/>
+      <p id="passwordError" style="display:none; color:#B72B1A; font-size:13px; margin-bottom:12px;">❌ Wrong password. Try again.</p>
+      <button id="passwordSubmit" style="width:100%; background:#1A1209; color:#E8D5A3; border:none; padding:13px; border-radius:4px; font-size:14px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer;">Enter Admin</button>
+    </div>
+  </div>
 </body>
 </html>

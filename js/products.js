@@ -83,7 +83,7 @@ const DEFAULT_PRODUCTS = [
 ];
 
 const DEFAULT_SETTINGS = {
-  whatsappNumber: '1234567890', // Replace with your number
+  whatsappNumber: '9647709730735',
   shopName: 'Maison Lumière',
   currency: 'USD'
 };
