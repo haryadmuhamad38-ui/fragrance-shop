@@ -1,17 +1,12 @@
-// =============================================
-//  SHOP.JS — Customer-facing logic
-// =============================================
-
 (function () {
-  const grid    = document.getElementById('productGrid');
-  const modal   = document.getElementById('orderModal');
+  const grid  = document.getElementById('productGrid');
+  const modal = document.getElementById('orderModal');
   let currentProduct = null;
 
   async function renderProducts() {
     try {
       const products = await DB.getProducts();
       const available = products.filter(p => p.available);
-
       grid.innerHTML = '';
 
       if (!available.length) {
@@ -22,15 +17,22 @@
       available.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product-card';
+
+        const thumbHtml = p.image_url
+          ? `<img src="${p.image_url}" alt="${p.name}" class="product-img"/>`
+          : `<div class="product-thumb-emoji" style="background:${p.bg||'linear-gradient(135deg,#C9A96E,#9B7A3F)'}">
+               <span style="font-size:72px">${p.emoji||'🌸'}</span>
+             </div>`;
+
         card.innerHTML = `
-          <div class="product-thumb" style="background:${p.bg || 'linear-gradient(135deg,#C9A96E,#9B7A3F)'}">
-            <span style="font-size:64px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))">${p.emoji || '🌸'}</span>
+          <div class="product-thumb">
+            ${thumbHtml}
             ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
           </div>
           <div class="product-body">
-            <p class="product-notes">${p.notes || ''}</p>
+            <p class="product-notes">${p.notes||''}</p>
             <h3 class="product-name">${p.name}</h3>
-            <p class="product-desc">${p.description || ''}</p>
+            <p class="product-desc">${p.description||''}</p>
             <div class="product-footer">
               <p class="product-price">${formatPrice(p.price)} <span>/ bottle</span></p>
               <button class="btn-order" data-id="${p.id}">Order Now</button>
@@ -46,8 +48,7 @@
           if (p) openModal(p);
         });
       });
-
-    } catch (e) {
+    } catch(e) {
       grid.innerHTML = '<p class="empty-state">Could not load products. Please try again later.</p>';
     }
   }
