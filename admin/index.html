@@ -11,32 +11,32 @@
 </head>
 <body class="admin-body">
 
-  <!-- ADMIN SIDEBAR -->
+  <!-- PASSWORD OVERLAY -->
+  <div id="passwordOverlay" style="position:fixed;inset:0;background:rgba(26,18,9,0.97);z-index:9999;display:flex;align-items:center;justify-content:center;">
+    <div style="background:#FAF6F0;border-radius:12px;padding:48px 40px;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);">
+      <div style="font-size:40px;margin-bottom:16px;">🔒</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:#1A1209;margin-bottom:8px;">Admin Access</h2>
+      <p style="color:#6B6055;font-size:14px;margin-bottom:24px;">Enter your password to continue</p>
+      <input id="passwordInput" type="password" placeholder="Password" style="width:100%;padding:12px 16px;border:1px solid #E8D5A3;border-radius:4px;font-size:15px;background:#fff;color:#1A1209;outline:none;margin-bottom:12px;"/>
+      <p id="passwordError" style="display:none;color:#B72B1A;font-size:13px;margin-bottom:12px;">❌ Wrong password. Try again.</p>
+      <button id="passwordSubmit" style="width:100%;background:#1A1209;color:#E8D5A3;border:none;padding:13px;border-radius:4px;font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">Enter Admin</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
   <aside class="admin-sidebar">
     <div class="sidebar-logo">
       <span class="logo-main">Maison Lumière</span>
       <span class="logo-sub">Admin Panel</span>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" class="sn-item active" data-tab="products">
-        <span class="sn-icon">🌸</span> Products
-      </a>
-      <a href="#" class="sn-item" data-tab="settings">
-        <span class="sn-icon">⚙️</span> Settings
-      </a>
-      <a href="../index.html" class="sn-item sn-external">
-        <span class="sn-icon">🏪</span> View Shop
-      </a>
+      <a href="#" class="sn-item active" data-tab="products"><span class="sn-icon">🌸</span> Products</a>
+      <a href="../index.html" class="sn-item sn-external"><span class="sn-icon">🏪</span> View Shop</a>
     </nav>
-    <div class="sidebar-footer">
-      <span class="sidebar-version">Maison Lumière v1.0</span>
-    </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main class="admin-main">
-
-    <!-- PRODUCTS TAB -->
     <div class="tab-pane active" id="tab-products">
       <div class="admin-topbar">
         <div>
@@ -45,13 +45,9 @@
         </div>
         <button class="btn-add" id="btnAddProduct">+ Add New Fragrance</button>
       </div>
-
-      <!-- Stats -->
       <div class="stats-row" id="statsRow"></div>
-
-      <!-- Product Table -->
       <div class="table-wrap">
-        <table class="admin-table" id="adminTable">
+        <table class="admin-table">
           <thead>
             <tr>
               <th>Fragrance</th>
@@ -65,54 +61,13 @@
         </table>
       </div>
     </div>
-
-    <!-- SETTINGS TAB -->
-    <div class="tab-pane" id="tab-settings">
-      <div class="admin-topbar">
-        <div>
-          <h1 class="admin-title">Settings</h1>
-          <p class="admin-subtitle">WhatsApp number, shop name, currency</p>
-        </div>
-      </div>
-      <div class="settings-card">
-        <div class="settings-section">
-          <h3 class="settings-heading">WhatsApp Configuration</h3>
-          <div class="form-group">
-            <label>WhatsApp Number</label>
-            <input type="text" id="settingWhatsapp" placeholder="e.g. 9665XXXXXXXX (with country code, no +)"/>
-            <small>Include country code without +. Example: 9665XXXXXXXX for Saudi Arabia</small>
-          </div>
-        </div>
-        <div class="settings-section">
-          <h3 class="settings-heading">Shop Identity</h3>
-          <div class="form-group">
-            <label>Shop Name</label>
-            <input type="text" id="settingShopName" placeholder="My Fragrance Shop"/>
-          </div>
-          <div class="form-group">
-            <label>Currency</label>
-            <select id="settingCurrency">
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="GBP">GBP (£)</option>
-              <option value="SAR">SAR (SR)</option>
-              <option value="AED">AED</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn-save" id="btnSaveSettings">Save Settings</button>
-        <p class="save-msg" id="saveMsg" style="display:none">✓ Settings saved!</p>
-      </div>
-    </div>
-
   </main>
 
-  <!-- ADD / EDIT PRODUCT MODAL -->
+  <!-- ADD/EDIT MODAL -->
   <div class="modal-overlay" id="productModal">
     <div class="modal admin-modal">
       <button class="modal-close" id="productModalClose">✕</button>
       <h3 class="modal-title" id="productModalTitle">Add New Fragrance</h3>
-
       <div class="modal-grid">
         <div class="form-group">
           <label>Fragrance Name *</label>
@@ -128,7 +83,7 @@
         </div>
         <div class="form-group full">
           <label>Description</label>
-          <textarea id="pDesc" placeholder="Describe the fragrance experience..."></textarea>
+          <textarea id="pDesc" placeholder="Describe the fragrance..."></textarea>
         </div>
         <div class="form-group">
           <label>Emoji Icon</label>
@@ -139,7 +94,7 @@
           <input type="text" id="pBadge" placeholder="New / Limited / Bestseller"/>
         </div>
         <div class="form-group full">
-          <label>Card Background Gradient</label>
+          <label>Card Background</label>
           <select id="pBg">
             <option value="linear-gradient(135deg,#1A1209 0%,#2E1A0E 100%)">Dark Oud</option>
             <option value="linear-gradient(135deg,#5E1224 0%,#8B3A52 100%)">Deep Rose</option>
@@ -147,7 +102,6 @@
             <option value="linear-gradient(135deg,#0F3A5E 0%,#2A6B9C 100%)">Ocean Blue</option>
             <option value="linear-gradient(135deg,#3B1F4E 0%,#7B5EA7 100%)">Iris Purple</option>
             <option value="linear-gradient(135deg,#1E3C1A 0%,#4A7A40 100%)">Forest Green</option>
-            <option value="linear-gradient(135deg,#3A2B1A 0%,#6B5040 100%)">Rich Brown</option>
             <option value="linear-gradient(135deg,#C9A96E 0%,#E8D5A3 100%)">Gold</option>
           </select>
         </div>
@@ -155,43 +109,32 @@
           <label>Available in Shop</label>
           <select id="pAvailable">
             <option value="true">Yes — Show to customers</option>
-            <option value="false">No — Hide from shop</option>
+            <option value="false">No — Hide</option>
           </select>
         </div>
       </div>
-
-      <input type="hidden" id="pEditId" value=""/>
+      <input type="hidden" id="pEditId"/>
+      <div id="saveError" style="display:none;color:#B72B1A;font-size:13px;margin-bottom:12px;"></div>
       <button class="btn-save" id="btnSaveProduct">Save Fragrance</button>
     </div>
   </div>
 
-  <!-- DELETE CONFIRM MODAL -->
+  <!-- DELETE MODAL -->
   <div class="modal-overlay" id="deleteModal">
-    <div class="modal" style="max-width:380px; text-align:center;">
+    <div class="modal" style="max-width:380px;text-align:center;">
       <button class="modal-close" id="deleteModalClose">✕</button>
-      <div style="font-size:48px; margin-bottom:16px;">🗑️</div>
+      <div style="font-size:48px;margin-bottom:16px;">🗑️</div>
       <h3 class="modal-title" style="margin-bottom:8px;">Remove Fragrance?</h3>
-      <p style="color:var(--smoke); margin-bottom:28px;" id="deleteProductName">This cannot be undone.</p>
-      <div style="display:flex; gap:12px; justify-content:center;">
+      <p style="color:var(--smoke);margin-bottom:28px;" id="deleteProductName">This cannot be undone.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
         <button class="btn-cancel" id="deleteCancel">Cancel</button>
         <button class="btn-delete" id="deleteConfirm">Yes, Remove</button>
       </div>
     </div>
   </div>
 
-  <script src="../js/products.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
   <script src="admin.js"></script>
-
-  <!-- PASSWORD OVERLAY -->
-  <div id="passwordOverlay" style="display:none; position:fixed; inset:0; background:rgba(26,18,9,0.97); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
-    <div style="background:#FAF6F0; border-radius:12px; padding:48px 40px; max-width:380px; width:90%; text-align:center; box-shadow:0 24px 80px rgba(0,0,0,0.5);">
-      <div style="font-size:40px; margin-bottom:16px;">🔒</div>
-      <h2 style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400; color:#1A1209; margin-bottom:8px;">Admin Access</h2>
-      <p style="color:#6B6055; font-size:14px; margin-bottom:24px;">Enter your password to continue</p>
-      <input id="passwordInput" type="password" placeholder="Password" style="width:100%; padding:12px 16px; border:1px solid #E8D5A3; border-radius:4px; font-size:15px; background:#fff; color:#1A1209; outline:none; margin-bottom:12px;"/>
-      <p id="passwordError" style="display:none; color:#B72B1A; font-size:13px; margin-bottom:12px;">❌ Wrong password. Try again.</p>
-      <button id="passwordSubmit" style="width:100%; background:#1A1209; color:#E8D5A3; border:none; padding:13px; border-radius:4px; font-size:14px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer;">Enter Admin</button>
-    </div>
-  </div>
 </body>
 </html>

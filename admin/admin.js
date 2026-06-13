@@ -1,23 +1,25 @@
 // =============================================
-//  ADMIN.JS — Admin panel logic
+//  ADMIN.JS — Admin panel with Supabase
 // =============================================
 
 (function () {
 
-  // ---- PASSWORD PROTECTION ----
-  const ADMIN_PASSWORD = '@m el_la00900';
-  const SESSION_KEY = 'adminUnlocked';
+  // ---- PASSWORD ----
+  const overlay = document.getElementById('passwordOverlay');
 
-  function checkPassword() {
-    if (sessionStorage.getItem(SESSION_KEY) === 'yes') return;
-    document.getElementById('passwordOverlay').style.display = 'flex';
+  function checkAuth() {
+    if (sessionStorage.getItem('adminOK') === 'yes') {
+      overlay.style.display = 'none';
+      init();
+    }
   }
 
   document.getElementById('passwordSubmit').addEventListener('click', () => {
     const val = document.getElementById('passwordInput').value;
-    if (val === ADMIN_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, 'yes');
-      document.getElementById('passwordOverlay').style.display = 'none';
+    if (val === CONFIG.ADMIN_PASSWORD) {
+      sessionStorage.setItem('adminOK', 'yes');
+      overlay.style.display = 'none';
+      init();
     } else {
       document.getElementById('passwordError').style.display = 'block';
       document.getElementById('passwordInput').value = '';
@@ -29,126 +31,108 @@
     if (e.key === 'Enter') document.getElementById('passwordSubmit').click();
   });
 
-  checkPassword();
+  checkAuth();
 
-  // ---- TAB NAVIGATION ----
-  document.querySelectorAll('.sn-item[data-tab]').forEach(item => {
-    item.addEventListener('click', e => {
-      e.preventDefault();
-      const tab = item.dataset.tab;
-
-      document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-
-      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-      document.getElementById('tab-' + tab).classList.add('active');
-
-      if (tab === 'settings') loadSettings();
-    });
-  });
-
-  // ---- STATS ----
-  function renderStats() {
-    const products = getProducts();
-    const settings = getSettings();
-    const total    = products.length;
-    const active   = products.filter(p => p.available).length;
-    const hidden   = total - active;
-    const avgPrice = total ? Math.round(products.reduce((s, p) => s + Number(p.price), 0) / total) : 0;
-
-    document.getElementById('statsRow').innerHTML = `
-      <div class="stat-card"><span class="stat-num">${total}</span><span class="stat-label">Total Fragrances</span></div>
-      <div class="stat-card"><span class="stat-num">${active}</span><span class="stat-label">Live in Shop</span></div>
-      <div class="stat-card"><span class="stat-num">${hidden}</span><span class="stat-label">Hidden</span></div>
-      <div class="stat-card"><span class="stat-num">${formatPrice(avgPrice, settings.currency)}</span><span class="stat-label">Avg. Price</span></div>
-    `;
+  // ---- MAIN INIT ----
+  function init() {
+    renderTable();
+    bindEvents();
   }
 
-  // ---- PRODUCT TABLE ----
-  function renderTable() {
-    const products = getProducts();
-    const settings = getSettings();
-    const tbody    = document.getElementById('adminTableBody');
-    tbody.innerHTML = '';
+  // ---- RENDER TABLE ----
+  async function renderTable() {
+    const tbody = document.getElementById('adminTableBody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#6B6055;">Loading...</td></tr>';
 
-    if (!products.length) {
-      tbody.innerHTML = '<tr class="empty-table-row"><td colspan="5">No fragrances yet. Add your first one!</td></tr>';
-      return;
-    }
+    try {
+      const products = await DB.getProducts();
 
-    products.forEach(p => {
-      const tr = document.createElement('tr');
-      tr.dataset.id = p.id;
-      tr.innerHTML = `
-        <td>
-          <div class="table-product-name">
-            <div class="table-emoji" style="background: ${p.bg || '#C9A96E33'}">${p.emoji || '🌸'}</div>
-            ${p.name}
-          </div>
-        </td>
-        <td>${p.notes || '—'}</td>
-        <td>
-          <div class="price-edit-wrap">
-            <span class="table-price" id="priceDisplay-${p.id}">${formatPrice(p.price, settings.currency)}</span>
-            <input class="price-input" id="priceInput-${p.id}" type="number" value="${p.price}" min="0"/>
-            <button class="btn-price-edit" id="priceEditBtn-${p.id}" onclick="startPriceEdit(${p.id})">Edit</button>
-            <button class="btn-price-save" id="priceSaveBtn-${p.id}" onclick="savePriceEdit(${p.id})">Save</button>
-          </div>
-        </td>
-        <td>
-          <div class="toggle-wrap">
-            <label class="toggle">
-              <input type="checkbox" ${p.available ? 'checked' : ''} onchange="toggleAvailability(${p.id}, this.checked)"/>
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="badge ${p.available ? 'badge-available' : 'badge-hidden'}">
-              ${p.available ? 'Live' : 'Hidden'}
-            </span>
-          </div>
-        </td>
-        <td>
-          <div class="action-btns">
-            <button class="btn-edit-row" onclick="openEditModal(${p.id})">✏️ Edit</button>
-            <button class="btn-delete-row" onclick="openDeleteModal(${p.id})">🗑️</button>
-          </div>
-        </td>
+      // Stats
+      const total  = products.length;
+      const active = products.filter(p => p.available).length;
+      document.getElementById('statsRow').innerHTML = `
+        <div class="stat-card"><span class="stat-num">${total}</span><span class="stat-label">Total Fragrances</span></div>
+        <div class="stat-card"><span class="stat-num">${active}</span><span class="stat-label">Live in Shop</span></div>
+        <div class="stat-card"><span class="stat-num">${total - active}</span><span class="stat-label">Hidden</span></div>
       `;
-      tbody.appendChild(tr);
-    });
 
-    renderStats();
+      tbody.innerHTML = '';
+
+      if (!products.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:60px;color:#6B6055;font-family:Cormorant Garamond,serif;font-size:20px;font-style:italic;">No fragrances yet. Add your first one!</td></tr>';
+        return;
+      }
+
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="table-product-name">
+              <div class="table-emoji" style="background:${p.bg || '#C9A96E33'}">${p.emoji || '🌸'}</div>
+              ${p.name}
+            </div>
+          </td>
+          <td>${p.notes || '—'}</td>
+          <td>
+            <div class="price-edit-wrap">
+              <span class="table-price" id="pd-${p.id}">${formatPrice(p.price)}</span>
+              <input class="price-input" id="pi-${p.id}" type="number" value="${p.price}" min="0"/>
+              <button class="btn-price-edit" id="pe-${p.id}" onclick="startEdit(${p.id})">Edit</button>
+              <button class="btn-price-save" id="ps-${p.id}" onclick="savePrice(${p.id})">Save</button>
+            </div>
+          </td>
+          <td>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" ${p.available ? 'checked' : ''} onchange="toggleAvail(${p.id}, this.checked)"/>
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="badge ${p.available ? 'badge-available' : 'badge-hidden'}">${p.available ? 'Live' : 'Hidden'}</span>
+            </div>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-edit-row" onclick="openEdit(${p.id})">✏️ Edit</button>
+              <button class="btn-delete-row" onclick="openDelete(${p.id}, '${p.name.replace(/'/g,"\\'")}')">🗑️</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+    } catch(e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#B72B1A;">Error loading products. Check your Supabase config.</td></tr>`;
+    }
   }
 
   // ---- INLINE PRICE EDIT ----
-  window.startPriceEdit = function (id) {
-    document.getElementById('priceDisplay-' + id).style.display = 'none';
-    document.getElementById('priceInput-'   + id).style.display = 'block';
-    document.getElementById('priceEditBtn-' + id).style.display = 'none';
-    document.getElementById('priceSaveBtn-' + id).style.display = 'block';
-    document.getElementById('priceInput-'   + id).focus();
+  window.startEdit = function(id) {
+    document.getElementById('pd-'+id).style.display = 'none';
+    document.getElementById('pi-'+id).style.display = 'block';
+    document.getElementById('pe-'+id).style.display = 'none';
+    document.getElementById('ps-'+id).style.display = 'block';
+    document.getElementById('pi-'+id).focus();
   };
 
-  window.savePriceEdit = function (id) {
-    const newPrice = parseFloat(document.getElementById('priceInput-' + id).value);
-    if (isNaN(newPrice) || newPrice < 0) return;
-
-    updateProduct(id, { price: newPrice });
-    renderTable();
+  window.savePrice = async function(id) {
+    const val = parseFloat(document.getElementById('pi-'+id).value);
+    if (isNaN(val) || val < 0) return;
+    try {
+      await DB.updateProduct(id, { price: val });
+      renderTable();
+    } catch(e) { alert('Failed to update price.'); }
   };
 
-  // ---- TOGGLE AVAILABILITY ----
-  window.toggleAvailability = function (id, available) {
-    updateProduct(id, { available });
-    renderTable();
+  // ---- TOGGLE ----
+  window.toggleAvail = async function(id, val) {
+    try {
+      await DB.updateProduct(id, { available: val });
+      renderTable();
+    } catch(e) { alert('Failed to update.'); }
   };
 
-  // ---- ADD / EDIT MODAL ----
+  // ---- ADD/EDIT MODAL ----
   const productModal = document.getElementById('productModal');
-  const productModalClose = document.getElementById('productModalClose');
-
-  document.getElementById('btnAddProduct').addEventListener('click', () => openAddModal());
-  productModalClose.addEventListener('click', closeProductModal);
-  productModal.addEventListener('click', e => { if (e.target === productModal) closeProductModal(); });
 
   function openAddModal() {
     document.getElementById('productModalTitle').textContent = 'Add New Fragrance';
@@ -159,34 +143,28 @@
     document.getElementById('pDesc').value   = '';
     document.getElementById('pEmoji').value  = '🌸';
     document.getElementById('pBadge').value  = '';
-    document.getElementById('pBg').value     = 'linear-gradient(135deg,#1A1209 0%,#2E1A0E 100%)';
     document.getElementById('pAvailable').value = 'true';
+    document.getElementById('saveError').style.display = 'none';
     productModal.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
-  window.openEditModal = function (id) {
-    const p = getProducts().find(x => x.id === id);
+  window.openEdit = async function(id) {
+    const products = await DB.getProducts();
+    const p = products.find(x => x.id === id);
     if (!p) return;
-
     document.getElementById('productModalTitle').textContent = 'Edit Fragrance';
     document.getElementById('pEditId').value  = id;
     document.getElementById('pName').value    = p.name;
     document.getElementById('pPrice').value   = p.price;
     document.getElementById('pNotes').value   = p.notes || '';
-    document.getElementById('pDesc').value    = p.desc  || '';
+    document.getElementById('pDesc').value    = p.description || '';
     document.getElementById('pEmoji').value   = p.emoji || '🌸';
     document.getElementById('pBadge').value   = p.badge || '';
     document.getElementById('pAvailable').value = p.available ? 'true' : 'false';
-
-    // Set background select
-    const bgSelect = document.getElementById('pBg');
-    let matched = false;
-    for (let opt of bgSelect.options) {
-      if (opt.value === p.bg) { bgSelect.value = opt.value; matched = true; break; }
-    }
-    if (!matched) bgSelect.selectedIndex = 0;
-
+    const bgSel = document.getElementById('pBg');
+    for (let o of bgSel.options) { if (o.value === p.bg) { bgSel.value = o.value; break; } }
+    document.getElementById('saveError').style.display = 'none';
     productModal.classList.add('open');
     document.body.style.overflow = 'hidden';
   };
@@ -196,44 +174,54 @@
     document.body.style.overflow = '';
   }
 
-  document.getElementById('btnSaveProduct').addEventListener('click', () => {
+  document.getElementById('btnSaveProduct').addEventListener('click', async () => {
     const name  = document.getElementById('pName').value.trim();
     const price = parseFloat(document.getElementById('pPrice').value);
+    const errEl = document.getElementById('saveError');
 
-    if (!name) { alert('Please enter a fragrance name.'); return; }
-    if (isNaN(price) || price < 0) { alert('Please enter a valid price.'); return; }
+    if (!name) { errEl.textContent = 'Please enter a name.'; errEl.style.display = 'block'; return; }
+    if (isNaN(price) || price < 0) { errEl.textContent = 'Please enter a valid price.'; errEl.style.display = 'block'; return; }
 
     const data = {
       name,
       price,
-      notes:     document.getElementById('pNotes').value.trim(),
-      desc:      document.getElementById('pDesc').value.trim(),
-      emoji:     document.getElementById('pEmoji').value.trim() || '🌸',
-      badge:     document.getElementById('pBadge').value.trim(),
-      bg:        document.getElementById('pBg').value,
-      available: document.getElementById('pAvailable').value === 'true',
+      notes:       document.getElementById('pNotes').value.trim(),
+      description: document.getElementById('pDesc').value.trim(),
+      emoji:       document.getElementById('pEmoji').value.trim() || '🌸',
+      badge:       document.getElementById('pBadge').value.trim(),
+      bg:          document.getElementById('pBg').value,
+      available:   document.getElementById('pAvailable').value === 'true',
     };
 
-    const editId = document.getElementById('pEditId').value;
-    if (editId) {
-      updateProduct(parseInt(editId), data);
-    } else {
-      addProduct(data);
-    }
+    const btn = document.getElementById('btnSaveProduct');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
 
-    closeProductModal();
-    renderTable();
+    try {
+      const editId = document.getElementById('pEditId').value;
+      if (editId) {
+        await DB.updateProduct(parseInt(editId), data);
+      } else {
+        await DB.addProduct(data);
+      }
+      closeProductModal();
+      renderTable();
+    } catch(e) {
+      errEl.textContent = 'Failed to save. Check your Supabase setup.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.textContent = 'Save Fragrance';
+      btn.disabled = false;
+    }
   });
 
   // ---- DELETE MODAL ----
   const deleteModal = document.getElementById('deleteModal');
   let pendingDeleteId = null;
 
-  window.openDeleteModal = function (id) {
-    const p = getProducts().find(x => x.id === id);
-    if (!p) return;
+  window.openDelete = function(id, name) {
     pendingDeleteId = id;
-    document.getElementById('deleteProductName').textContent = `"${p.name}" will be permanently removed.`;
+    document.getElementById('deleteProductName').textContent = `"${name}" will be permanently removed.`;
     deleteModal.classList.add('open');
     document.body.style.overflow = 'hidden';
   };
@@ -244,53 +232,24 @@
     pendingDeleteId = null;
   }
 
-  document.getElementById('deleteModalClose').addEventListener('click', closeDeleteModal);
-  document.getElementById('deleteCancel').addEventListener('click', closeDeleteModal);
-  deleteModal.addEventListener('click', e => { if (e.target === deleteModal) closeDeleteModal(); });
-
-  document.getElementById('deleteConfirm').addEventListener('click', () => {
-    if (pendingDeleteId === null) return;
-    deleteProduct(pendingDeleteId);
-    closeDeleteModal();
-    renderTable();
-  });
-
-  // ---- SETTINGS ----
-  function loadSettings() {
-    const s = getSettings();
-    document.getElementById('settingWhatsapp').value  = s.whatsappNumber || '';
-    document.getElementById('settingShopName').value  = s.shopName || '';
-    document.getElementById('settingCurrency').value  = s.currency || 'USD';
-  }
-
-  document.getElementById('btnSaveSettings').addEventListener('click', () => {
-    const settings = {
-      whatsappNumber: document.getElementById('settingWhatsapp').value.trim(),
-      shopName:       document.getElementById('settingShopName').value.trim() || 'My Fragrance Shop',
-      currency:       document.getElementById('settingCurrency').value,
-    };
-
-    if (!settings.whatsappNumber) {
-      alert('Please enter your WhatsApp number.');
-      return;
-    }
-
-    saveSettings(settings);
-    const msg = document.getElementById('saveMsg');
-    msg.style.display = 'block';
-    setTimeout(() => { msg.style.display = 'none'; }, 3000);
-  });
-
-  // Escape to close any modal
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeProductModal();
+  document.getElementById('deleteConfirm').addEventListener('click', async () => {
+    if (!pendingDeleteId) return;
+    try {
+      await DB.deleteProduct(pendingDeleteId);
       closeDeleteModal();
-    }
+      renderTable();
+    } catch(e) { alert('Failed to delete.'); }
   });
 
-  // ---- INIT ----
-  renderTable();
-  loadSettings();
+  // ---- BIND EVENTS ----
+  function bindEvents() {
+    document.getElementById('btnAddProduct').addEventListener('click', openAddModal);
+    document.getElementById('productModalClose').addEventListener('click', closeProductModal);
+    document.getElementById('deleteModalClose').addEventListener('click', closeDeleteModal);
+    document.getElementById('deleteCancel').addEventListener('click', closeDeleteModal);
+    productModal.addEventListener('click', e => { if (e.target === productModal) closeProductModal(); });
+    deleteModal.addEventListener('click', e => { if (e.target === deleteModal) closeDeleteModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProductModal(); closeDeleteModal(); }});
+  }
 
 })();
