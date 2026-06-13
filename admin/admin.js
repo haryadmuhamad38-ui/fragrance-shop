@@ -35,7 +35,7 @@
 
   // ---- INIT ----
   function init() {
-    bindEvents();
+    bindGlobalEvents();
     renderTable();
   }
 
@@ -284,7 +284,7 @@
   });
 
   // ---- BIND ALL EVENTS ----
-  function bindEvents() {
+  function bindGlobalEvents() {
     // Add button
     document.getElementById('btnAddProduct').addEventListener('click', openAddModal);
 
