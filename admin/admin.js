@@ -35,8 +35,8 @@
 
   // ---- INIT ----
   function init() {
-    renderTable();
     bindEvents();
+    renderTable();
   }
 
   // ---- RENDER TABLE ----
@@ -57,7 +57,7 @@
       tbody.innerHTML = '';
 
       if (!products.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:60px;color:#6B6055;font-family:Cormorant Garamond,serif;font-size:20px;font-style:italic;">No fragrances yet. Add your first one!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:60px;color:#6B6055;font-family:Cormorant Garamond,serif;font-size:20px;font-style:italic;">No fragrances yet. Add your first fragrance!</td></tr>';
         return;
       }
 
