@@ -323,12 +323,41 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.2s;
+  width: 100%;
+  margin-top: 20px;
 }
 .btn-save:hover { background: var(--gold-dark); }
 .save-msg { color: var(--green-wa); font-size: 14px; margin-top: 12px; font-weight: 500; }
 
+/* --- MODAL OVERLAY --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 18, 9, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-overlay.open {
+  display: flex;
+}
+
 /* --- ADMIN MODAL --- */
-.admin-modal { max-width: 600px; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(26, 18, 9, 0.3);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.admin-modal { 
+  max-width: 600px;
+}
 .modal-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -337,6 +366,84 @@
 }
 .modal-grid .full { grid-column: 1 / -1; }
 .admin-modal .modal-title { margin-bottom: 0; }
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--smoke);
+  transition: color 0.2s;
+}
+.modal-close:hover { color: var(--ink); }
+
+/* Form groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--parchment-2);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--ink);
+  font-family: inherit;
+  background: var(--white);
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 181, 83, 0.1);
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Image upload */
+.image-upload-box {
+  border: 2px dashed var(--parchment-2);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-upload-box:hover {
+  border-color: var(--gold);
+  background: var(--parchment);
+}
 
 .btn-cancel {
   background: var(--parchment-2);
